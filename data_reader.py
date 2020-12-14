@@ -11,7 +11,7 @@ from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.naive_bayes import GaussianNB
 from sklearn.preprocessing import StandardScaler, LabelEncoder
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, VotingClassifier, BaggingClassifier
-from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, classification_report
+from sklearn.metrics import accuracy_score, confusion_matrix, precision_score, recall_score, classification_report, f1_score, roc_auc_score, roc_curve
 sns.set()
 from time import time
 
@@ -73,23 +73,41 @@ def model_evaluation(y_test, y_pred):
 
     # Computing the following with confusion matrix
     cf_1 = confusion_matrix(y_test, y_pred)
-
+    
     # Computing my simple model evaluation metrics - that is, TP, TN, FP etc.,
-    fetal_TP = cf_1[1][1]  #TP - true positives
-    fetal_FP = cf_1[0][1]  #FP - false positives
-    fetal_TN = cf_1[0][0]  #TN - true negativess
-    fetal_FN = cf_1[1][0]  #FN - false negatives
-    fetal_TPR = round((fetal_TP/(fetal_TP + fetal_FN)) * 100, 2) #TPR = TP/(TP + FN)
-    fetal_TNR = round((fetal_TN/(fetal_TN + fetal_FP)) * 100, 2) #TNR = TN/(TN + FP)
-    fetal_FPR = round((fetal_FP/(fetal_FP + fetal_TN)) * 100, 2) #FPR = FP/(FP + TN)
-    fetal_ACC = round(((fetal_TP + fetal_TN)/(fetal_TP + fetal_TN + fetal_FP + fetal_FN)) * 100, 2)
+    fetal_TP = cf_1[0][0]  #TP - true positives
+    fetal_FP = cf_1[0][1]  #FN - false negatives
+    fetal_FN = cf_1[1][0]  #FP - false positives
+    fetal_TN = cf_1[1][1]  #TN - true negativess
+    
+    P = fetal_TP + fetal_FP
+    N = fetal_FN + fetal_TN
+    P_N = P + N
+    
+    fetal_TPR = round((fetal_TP/(P)) * 100, 2) #TPR = TP/(TP + FN)
+    fetal_TNR = round((fetal_TN/(N)) * 100, 2) #TNR = TN/(TN + FP)
+    fetal_FPR = round((fetal_FP/(N)) * 100, 2) #FPR = FP/(FP + TN)
+    fetal_ACC = round(((fetal_TP + fetal_TN)/(P_N)) * 100, 2)
+    fetal_PPV = round((fetal_TP/( fetal_TP + fetal_FP)) * 100, 2) #PPV = TP/(TP + FP)
+    fetal_NPV = round((fetal_TN/(fetal_TN + fetal_FN)) * 100, 2) #NPV = TN/(FN + TN)
+    fetal_f1 = round((2 * fetal_TP)/((2 * fetal_TP) + fetal_FP + fetal_FN)* 100, 2)
+    roc_score = roc_auc_score(y_test, y_pred)
    
     # Displaying the Performance metrics of the model
-    print(f'TP - true positives: {fetal_TP}\nFP - false positives: {fetal_FP}\nTN - true negativess: '
-          f'{fetal_TN}\nFN - false negatives: {fetal_FN}\nTPR-true positive rate: {fetal_TPR}%\n'
-          f'TNR - true negative rate: {fetal_TNR}%\nFPR - False Positive Rate: {fetal_FPR}%\n')
+    print(f'TP - True positives: {fetal_TP}\n'
+          f'FP - False positives: {fetal_FP}\n'
+          f'TN - True negativess: {fetal_TN}\n'
+          f'FN - False negatives: {fetal_FN}\n\n'
+          f'TPR - True positive rate: {fetal_TPR}%\n'
+          f'TNR - True negative rate: {fetal_TNR}%\n'
+          f'FPR - False Positive Rate: {fetal_FPR}%\n'
+          f'PPV - Positive predictive value: {fetal_PPV}%\n'
+          f'NPV - Negative predictive value: {fetal_NPV}%\n'
+          f'F1 - Score: {fetal_f1}%')
+    print("ROC - Receiving Operating Characteristics Score {:.2%}".format(roc_score), '\n')
+    
+    # Print classification report
     print(classification_report(y_test, y_pred))
-    print(end='\n')
     
 # Method for Kneighborsclassifier_model 
 def knn_classifier_model(X_train, X_test, y_train, y_test):
@@ -113,7 +131,7 @@ def knn_classifier_model(X_train, X_test, y_train, y_test):
     accuracy = accuracy_score(y_test, y_pred)
 
     # Print the reports.
-    print("Accuracy: %.2f%%" % (accuracy *100.0), '\n') 
+    print("Accuracy: {:.2%}".format(accuracy), '\n') 
     model_evaluation(y_test, y_pred)
     print("\nNumber of mislabeled points out of a total %d points : %d" % (X_test.shape[0], (y_test != y_pred).sum()))
     return y_pred
@@ -295,28 +313,6 @@ def baggingClassifier_Model(df):
     # define a function that accepts a threshold and prints sensitivity and specificity
 def evaluate_threshold(threshold):
     print('Sensitivity:', tpr[thresholds > threshold][-1])
-    print('Specificity:', 1 - fpr[thresholds > threshold][-1])
-
-        
-# IMPORTANT: first argument is true values, second argument is predicted probabilities
-
-# we pass y_test and y_pred_prob
-# we do not use y_pred_class, because it will give incorrect results without generating an error
-# roc_curve returns 3 objects fpr, tpr, thresholds
-# fpr: false positive rate
-# tpr: true positive rate
-# fpr, tpr, thresholds = metrics.roc_curve(y_test, y_pred_prob)
-
-# plt.plot(fpr, tpr)
-# plt.xlim([0.0, 1.0])
-# plt.ylim([0.0, 1.0])
-# plt.rcParams['font.size'] = 12
-# plt.title('ROC curve for diabetes classifier')
-# plt.xlabel('False Positive Rate (1 - Specificity)')
-# plt.ylabel('True Positive Rate (Sensitivity)')
-# plt.grid(True)
-        
-        
-        
+    print('Specificity:', 1 - fpr[thresholds > threshold][-1])  
         
         
