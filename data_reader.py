@@ -156,7 +156,7 @@ def logistic_regression_model(X_train, X_test, y_train, y_test):
 
     # Computing for the accuracy, precision, & recall
     result = model.score(X_test, y_test)
-    print("Accuracy: %.2f%%" % (result * 100.0), '\n')
+    print("Accuracy: {:.2%}".format(result), '\n')
     
     # Diplay performance metrics     
     model_evaluation(y_test, y_pred)
@@ -169,10 +169,10 @@ def decisionTreeClassifier_model(X_train, X_test, y_train, y_test):
     
     # Create classifier
     model = DecisionTreeClassifier(criterion='entropy')
-    
+
     # Fit the classifier on the training features and labels.
     t0 = time()
-    model.fit(X_train, y_train)
+    model = model.fit(X_train, y_train)
     print('\nPerfomance Report:\n')
     print("Training time:", round(time()-t0, 3), "s")
 
@@ -183,7 +183,7 @@ def decisionTreeClassifier_model(X_train, X_test, y_train, y_test):
 
     # Computing for the accuracy, precision, & recall
     result = model.score(X_test, y_test)
-    print("Accuracy: %.2f%%" % (result * 100.0), '\n')
+    print("Accuracy: {:.2%}".format(result), '\n')
     
     # Diplay performance metrics     
     model_evaluation(y_test, y_pred)
@@ -210,7 +210,7 @@ def gaussianNB_model(X_train, X_test, y_train, y_test):
 
     # Computing for the accuracy, precision, & recall
     result = model.score(X_test, y_test)
-    print("Accuracy: %.2f%%" % (result * 100.0), '\n')
+    print("Accuracy: {:.2%}".format(result), '\n')
     
     # Diplay performance metrics     
     model_evaluation(y_test, y_pred)
@@ -237,7 +237,7 @@ def linearDiscriminantAnalysis_model(X_train, X_test, y_train, y_test):
 
     # Computing for the accuracy, precision, & recall
     result = model.score(X_test, y_test)
-    print("Accuracy: %.2f%%" % (result * 100.0), '\n')
+    print("Accuracy: {:.2%}".format(result), '\n')
     
     # Diplay performance metrics     
     model_evaluation(y_test, y_pred)
@@ -265,7 +265,7 @@ def randomForestClassifier_model(df, X_train, X_test, y_train, y_test):
 
     # Computing for the accuracy, precision, & recall
     result = model.score(X_test, y_test)
-    print("Accuracy: %.2f%%" % (result * 100.0), '\n')
+    print("Accuracy: {:.2%}".format(result), '\n')
     
     # Diplay performance metrics     
     model_evaluation(y_test, y_pred)
@@ -308,7 +308,7 @@ def baggingClassifier_Model(df):
         
         # Computing for the accuracy, precision, & recall
         result = bag.score(X_test_norm, y_test)
-        print("Accuracy: %.2f%%" % (result * 100.0), [model])
+        print("Accuracy: {:.2%}".format(result), [model])
         
     # define a function that accepts a threshold and prints sensitivity and specificity
 def evaluate_threshold(threshold):
